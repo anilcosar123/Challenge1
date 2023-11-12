@@ -8,7 +8,6 @@ import plotly.express as px
 # Global variable to track the current tab
 current_tab = 'Homepage'
 
-
 # Function to plot interactive line charts for EDA and BVP
 def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_bvp, end_time_bvp):
     st.subheader('Interactive Line Charts')
@@ -74,58 +73,6 @@ def manage_food_history():
     st.write(f'The average weekly calorie consumption for the entire history is: {average_weekly_calories_total:.2f} calories.')
 
 
-    # Function for Homepage content
-@st.cache_resource
-def homepage_content():
-    
-    st.write('This is the homepage content.')
-
-    st.title('Welcome to Your App Homepage')
-    
-    # Add some introductory text
-    st.write('This is the homepage of your phone app.')
-
-    # Display a calendar image (replace the URL with your own image)
-    st.image(r"C:\Users\anilp\Project_Files\streamlit stuff\calendar.jpg", caption='Your Calendar Image', use_column_width=True)
-
-    # Add any additional content you want for the homepage
-    st.write('Feel free to explore other tabs using the navigation sidebar.')
-    
-   
-
-
-# Function for Gym content
-@st.cache_resource
-def gym_content(data):
-    
-    st.write('This is the gym content.')
-    # Define slider for interactivity - Line Charts
-    st.subheader("Line Chart Configuration for EDA")
-    start_time_line_eda = st.slider("Select Start Time - Line Chart (EDA)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].min().timestamp())
-    end_time_line_eda = st.slider("Select End Time - Line Chart (EDA)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].max().timestamp())
-
-    st.subheader("Line Chart Configuration for BVP")
-    start_time_line_bvp = st.slider("Select Start Time - Line Chart (BVP)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].min().timestamp())
-    end_time_line_bvp = st.slider("Select End Time - Line Chart (BVP)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].max().timestamp())
-
-    # Call function for interactive line charts
-    plot_interactive_line_charts(data, pd.Timestamp(start_time_line_eda, unit='s'), pd.Timestamp(end_time_line_eda, unit='s'),
-                                 pd.Timestamp(start_time_line_bvp, unit='s'), pd.Timestamp(end_time_line_bvp, unit='s'))
-    
-
-# Function for Health content
-@st.cache_resource
-def health_content():
-    st.write('This is the health content.')
-    manage_food_history()
-    
-
-
-# Function for Pop-up content
-@st.cache_resource
-def popup_content():
-    st.write('This is the pop-up content.')
-        
 
     # Add content for Tab 3 as needed
 
@@ -165,29 +112,87 @@ def main():
     """
 
     st.markdown(header_html, unsafe_allow_html=True)
-    
-    
+
     # Extract the tab name from the URL
     tab = st.experimental_get_query_params().get("tab", ["Homepage"])[0]
 
     current_tab = tab  # Update the current tab
 
-    # Use st.cache to cache the function results
-    if tab == 'Homepage':
+    # Render content for the selected tab
+    if st.button("Homepage"):
+        current_tab = 'Homepage'
+        st.experimental_set_query_params(tab=current_tab)
         homepage_content()
 
-    elif tab == 'Gym':
+    elif st.button("Gym"):
+        current_tab = 'Gym'
+        st.experimental_set_query_params(tab=current_tab)
         gym_content(data)
 
-    elif tab == 'Health':
+    elif st.button("Health"):
+        current_tab = 'Health'
+        st.experimental_set_query_params(tab=current_tab)
         health_content()
 
-    elif tab == 'Pop-up':
+    elif st.button("Pop-up"):
+        current_tab = 'Pop-up'
+        st.experimental_set_query_params(tab=current_tab)
         popup_content()
 
+
+    # Function for Homepage content
+@st.cache_resource(experimental_allow_widgets=True)
+def homepage_content():
+    
+    st.write('This is the homepage content.')
+
+    st.title('Welcome to Your App Homepage')
+    
+    # Add some introductory text
+    st.write('This is the homepage of your phone app.')
+
+    # Display a calendar image (replace the URL with your own image)
+    st.image(r"C:\Users\anilp\Project_Files\streamlit stuff\calendar.jpg", caption='Your Calendar Image', use_column_width=True)
+
+    # Add any additional content you want for the homepage
+    st.write('Feel free to explore other tabs using the navigation sidebar.')
+    
+   
+
+
+# Function for Gym content
+@st.cache_resource(experimental_allow_widgets=True)
+def gym_content(data):
+    
+    st.write('This is the gym content.')
+    # Define slider for interactivity - Line Charts
+    st.subheader("Line Chart Configuration for EDA")
+    start_time_line_eda = st.slider("Select Start Time - Line Chart (EDA)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].min().timestamp())
+    end_time_line_eda = st.slider("Select End Time - Line Chart (EDA)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].max().timestamp())
+
+    st.subheader("Line Chart Configuration for BVP")
+    start_time_line_bvp = st.slider("Select Start Time - Line Chart (BVP)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].min().timestamp())
+    end_time_line_bvp = st.slider("Select End Time - Line Chart (BVP)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].max().timestamp())
+
+    # Call function for interactive line charts
+    plot_interactive_line_charts(data, pd.Timestamp(start_time_line_eda, unit='s'), pd.Timestamp(end_time_line_eda, unit='s'),
+                                 pd.Timestamp(start_time_line_bvp, unit='s'), pd.Timestamp(end_time_line_bvp, unit='s'))
     
     
 
+# Function for Health content
+@st.cache_resource(experimental_allow_widgets=True)
+def health_content():
+    st.write('This is the health content.')
+    manage_food_history()
+    
+
+
+# Function for Pop-up content
+@st.cache_resource(experimental_allow_widgets=True)
+def popup_content():
+    st.write('This is the pop-up content.')
+        
 
 if __name__ == '__main__':
     main()
