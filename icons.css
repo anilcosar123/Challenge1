@@ -1,0 +1,18 @@
+header_html = 
+"""
+        <style>
+            .header {
+                display: flex;
+                flex-direction: column;  /* Change to column */
+                align-items: center;      /* Center align items */
+            }
+            .nav-buttons {
+                display: flex;
+                flex-direction: column;  /* Change to column */
+                align-items: center;      /* Center align items */
+            }
+            .nav-button {
+                margin-bottom: 10px;    /* Add margin-bottom for spacing */
+            }
+        </style>
+"""
