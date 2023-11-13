@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import matplotlib.pyplot as plt
 
 
 
@@ -87,75 +88,54 @@ def main():
     # Convert 'Time' column to datetime format
     data['Time'] = pd.to_datetime(data['Time'])
 
-    # Header with navigation buttons
-    header_html = """
-        <style>
-            .header {
-                display: flex;
-                justify-content: space-between;
-            }
-            .nav-buttons {
-                display: flex;
-            }
-            .nav-button {
-                margin-right: 10px;
-            }
-        </style>
-        <div class="header">
-            <h1>Gym/Health</h1>
-            <div class="nav-buttons">
-                <button class="nav-button" onclick="setTab('Homepage');">Homepage</button>
-                <button class="nav-button" onclick="setTab('Gym');">Gym</button>
-                <button class="nav-button" onclick="setTab('Health');">Health</button>
-            </div>
-        </div>
-    """
-
-    st.markdown(header_html, unsafe_allow_html=True)
-
     # Extract the tab name from the URL
     tab = st.experimental_get_query_params().get("tab", ["Homepage"])[0]
 
     current_tab = tab  # Update the current tab
 
-    # Render content for the selected tab
-    if st.button("Homepage"):
+    # Use st.checkbox with Markdown styling for buttons
+    if st.checkbox("Homepage", key="Homepage", value=current_tab == 'Homepage', help="<div style='margin-bottom: 10px;'>Homepage</div>"):
         current_tab = 'Homepage'
         st.experimental_set_query_params(tab=current_tab)
         homepage_content()
-
-    elif st.button("Gym"):
+    
+    if st.checkbox("Gym", key="Gym", value=current_tab == 'Gym', help="<div style='margin-bottom: 10px;'>Gym</div>"):
         current_tab = 'Gym'
         st.experimental_set_query_params(tab=current_tab)
         gym_content(data)
-
-    elif st.button("Health"):
+    
+    if st.checkbox("Health", key="Health", value=current_tab == 'Health', help="<div style='margin-bottom: 10px;'>Health</div>"):
         current_tab = 'Health'
         st.experimental_set_query_params(tab=current_tab)
         health_content()
-
-    elif st.button("Pop-up"):
+    
+    if st.checkbox("Pop-up", key="Pop-up", value=current_tab == 'Pop-up', help="<div style='margin-bottom: 10px;'>Pop-up</div>"):
         current_tab = 'Pop-up'
         st.experimental_set_query_params(tab=current_tab)
         popup_content()
+
 
 
     # Function for Homepage content
 @st.cache_resource(experimental_allow_widgets=True)
 def homepage_content():
     
-    st.write('This is the homepage content.')
-
-    st.title('Welcome to Your App Homepage')
+    st.write('With our app you can see the data related to EDA and BVP while keeping a track of your calories and weight!')
+    st.write('EDA:', 'BVP:')
     
     # Add some introductory text
-    st.write('This is the homepage of your phone app.')
+    st.write('Average weekly calorie consumption(measured by last 7 inputs in dataframe): 123')
+    st.write('Average weekly weight(measured by last 7 inputs in dataframe): 123')
+    
+    st.write('Pop-up button')
 
-    # Display a calendar image (replace the URL with your own image)
-    st.image(r"C:\Users\anilp\Project_Files\streamlit stuff\calendar.jpg", caption='Your Calendar Image', use_column_width=True)
-
+    calendar = pd.DataFrame(index=['Week 1','Week 2','Week 3', 'Week 4'], columns=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+    st.write(calendar)
+    
+    st.markdown('<style>' + open('icons.css').read() + '</style>', unsafe_allow_html=True)
+    
     # Add any additional content you want for the homepage
-    st.write('Feel free to explore other tabs using the navigation sidebar.')
+    st.write('Homepage Button' , )
     
    
 
@@ -165,27 +145,61 @@ def homepage_content():
 def gym_content(data):
     
     st.write('This is the gym content.')
-    # Define slider for interactivity - Line Charts
-    st.subheader("Line Chart Configuration for EDA")
-    start_time_line_eda = st.slider("Select Start Time - Line Chart (EDA)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].min().timestamp())
-    end_time_line_eda = st.slider("Select End Time - Line Chart (EDA)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].max().timestamp())
-
-    st.subheader("Line Chart Configuration for BVP")
-    start_time_line_bvp = st.slider("Select Start Time - Line Chart (BVP)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].min().timestamp())
-    end_time_line_bvp = st.slider("Select End Time - Line Chart (BVP)", min_value=data['Time'].min().timestamp(), max_value=data['Time'].max().timestamp(), value=data['Time'].max().timestamp())
 
     # Call function for interactive line charts
-    plot_interactive_line_charts(data, pd.Timestamp(start_time_line_eda, unit='s'), pd.Timestamp(end_time_line_eda, unit='s'),
-                                 pd.Timestamp(start_time_line_bvp, unit='s'), pd.Timestamp(end_time_line_bvp, unit='s'))
-    
+    plot_interactive_line_charts(data, data['Time'].min(), data['Time'].max(), data['Time'].min(), data['Time'].max())
+
+    # Read data for the bar chart from another CSV file
+    bar_chart_data_path = r"C:\Users\anilp\Project_Files\10-11-2023 23h06m48s\df_result.csv"
+    bar_chart_data = pd.read_csv(bar_chart_data_path)
+
+    # Categorize values into Low, Medium, and High based on percentiles
+    low_threshold = bar_chart_data['EDA'].quantile(0.33)
+    high_threshold = bar_chart_data['EDA'].quantile(0.67)
+
+    bar_chart_data['Category'] = pd.cut(bar_chart_data['EDA'], bins=[float('-inf'), low_threshold, high_threshold, float('inf')],
+                              labels=['Low', 'Medium', 'High'])
+
+    # Create a bar chart for the new data
+    fig, ax = plt.subplots()
+
+    # Count the occurrences in each category
+    category_counts = bar_chart_data['Category'].value_counts()
+
+    # Bar for each category
+    for category in category_counts.index:
+        ax.bar(category, category_counts[category], label=category)
+
+    ax.set_ylabel('Count')
+    ax.set_title('Category Distribution from Bar Chart Data')
+    ax.legend(title='Category')
+
+    # Set y-axis limits
+    ax.set_ylim(0, 50)
+
+    # Display the bar chart using st.pyplot
+    st.pyplot(fig)
+
     
 
 # Function for Health content
 @st.cache_resource(experimental_allow_widgets=True)
 def health_content():
     st.write('This is the health content.')
-    manage_food_history()
+    #manage_food_history()
     
+    calorie = pd.DataFrame(index=['Input values:'], columns=['Your calorie intake on Monday was : 1', 'Your calorie intake on Tuesday was : 2', 'Your calorie intake on Wednesday was : 3',
+    'Your calorie intake on Thursday was : 4', 'Your calorie intake on Friday was : 5', 'Your calorie intake on Saturday was : 6', 'Your calorie intake on Sunday was : 7'])
+
+
+    weight = pd.DataFrame(index=['Input values'], columns=['Your weight on Monday was : ', 'Your weight on Tuesday was : ', 'Your weight on Wednesday was : ',
+    'Your weight on Thursday was : ', 'Your weight on Friday was : ', 'Your weight on Saturday was : ', 'Your weight on Sunday was : '])
+    
+    st.write(calorie)
+    st.write('Average calorie consumption for your week was : ')
+    
+    st.write(weight)
+    st.write('Avegare weight for your week was : ')
 
 
 # Function for Pop-up content
