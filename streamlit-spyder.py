@@ -2,12 +2,77 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
-
+import altair as alt
 
 
 # Global variable to track the current tab
 # Global variable to track the current tab
 current_tab = 'Homepage'
+
+def plot_interactive_bar_chart_EDA():
+    
+    df = pd.read_csv(r"C:\Users\anilp\Project_Files\13-11-2023 09h53m09s\df_all_eda.csv")
+
+    filtered_df = df[df['EDA'] >= 1]
+    
+    bins = [0.5, 4, 8, float('inf')]
+    labels = ['Low', 'Medium', 'High']
+    
+    filtered_df['Category'] = pd.cut(filtered_df['EDA'], bins=bins, labels=labels, right=False)
+
+    grouped_df = filtered_df.groupby(['Category', 'EDA']).size().reset_index(name='Count')
+   
+    median_value = filtered_df['EDA'].median()
+    mean_value = filtered_df['EDA'].mean()
+    mode_value = filtered_df['EDA'].mode().iloc[0]  
+
+    chart = alt.Chart(grouped_df).mark_bar().encode(
+        x='EDA:Q',
+        y='Count:Q',
+        color='Category:N',
+        tooltip=['Category:N', 'EDA:Q', 'Count:Q']
+    )
+
+    chart = chart + \
+        alt.Chart(pd.DataFrame({'value': [mean_value]})).mark_rule(color='red').encode(x='value:Q', size=alt.value(2)) + \
+        alt.Chart(pd.DataFrame({'value': [median_value]})).mark_rule(color='green').encode(x='value:Q', size=alt.value(2)) + \
+        alt.Chart(pd.DataFrame({'value': [mode_value]})).mark_rule(color='blue').encode(x='value:Q', size=alt.value(2))
+
+    st.altair_chart(chart, use_container_width=True)
+    
+    
+    
+def plot_interactive_bar_chart_BVP():
+    
+    df = pd.read_csv(r"C:\Users\anilp\Project_Files\13-11-2023 21h24m55s\df_all_bvp.csv")
+    
+    filtered_df = df[(df['BVP'] >= 2) & (df['BVP'] <= 260)]
+
+    bins = [ 1.5, 4, 8, 500]
+    labels = [ 'Low', 'Medium', 'High']
+
+    filtered_df['Category'] = pd.cut(filtered_df['BVP'], bins=bins, labels=labels, right=False)
+
+    grouped_df = filtered_df.groupby(['Category', 'BVP']).size().reset_index(name='Count')
+   
+    median_value = filtered_df['BVP'].median()
+    mean_value = filtered_df['BVP'].mean()
+    mode_value = filtered_df['BVP'].mode().iloc[0]  
+
+    chart = alt.Chart(grouped_df).mark_bar().encode(
+        x='BVP:Q',
+        y='Count:Q',
+        color='Category:N',
+        tooltip=['Category:N', 'BVP:Q', 'Count:Q']
+    )
+
+    chart = chart + \
+        alt.Chart(pd.DataFrame({'value': [mean_value]})).mark_rule(color='red').encode(x='value:Q', size=alt.value(2)) + \
+        alt.Chart(pd.DataFrame({'value': [median_value]})).mark_rule(color='green').encode(x='value:Q', size=alt.value(2)) + \
+        alt.Chart(pd.DataFrame({'value': [mode_value]})).mark_rule(color='blue').encode(x='value:Q', size=alt.value(2))
+
+    st.altair_chart(chart, use_container_width=True)
+    
 
 # Function to plot interactive line charts for EDA and BVP
 def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_bvp, end_time_bvp):
@@ -25,6 +90,7 @@ def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_
     )
     
     st.plotly_chart(fig_eda)
+    plot_interactive_bar_chart_EDA()
 
     # Filter data for BVP based on time range
     filtered_data_bvp = data[(data['Time'] >= start_time_bvp) & (data['Time'] <= end_time_bvp)]
@@ -38,6 +104,7 @@ def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_
     )
     
     st.plotly_chart(fig_bvp)
+    plot_interactive_bar_chart_BVP()
 
 # Function to manage food consumption history in Tab 2
 def manage_food_history():
@@ -93,26 +160,48 @@ def main():
 
     current_tab = tab  # Update the current tab
 
-    # Use st.checkbox with Markdown styling for buttons
-    if st.checkbox("Homepage", key="Homepage", value=current_tab == 'Homepage', help="<div style='margin-bottom: 10px;'>Homepage</div>"):
-        current_tab = 'Homepage'
-        st.experimental_set_query_params(tab=current_tab)
-        homepage_content()
+# =============================================================================
+#     # Use st.checkbox with Markdown styling for buttons
+#     if st.checkbox("Homepage", key="Homepage", value=current_tab == 'Homepage', help="<div style='margin-bottom: 10px;'>Homepage</div>"):
+#         current_tab = 'Homepage'
+#         st.experimental_set_query_params(tab=current_tab)
+#         homepage_content()
+#     
+#     if st.checkbox("Gym", key="Gym", value=current_tab == 'Gym', help="<div style='margin-bottom: 10px;'>Gym</div>"):
+#         current_tab = 'Gym'
+#         st.experimental_set_query_params(tab=current_tab)
+#         gym_content(data)
+#     
+#     if st.checkbox("Health", key="Health", value=current_tab == 'Health', help="<div style='margin-bottom: 10px;'>Health</div>"):
+#         current_tab = 'Health'
+#         st.experimental_set_query_params(tab=current_tab)
+#         health_content()
+#     
+#     if st.checkbox("Pop-up", key="Pop-up", value=current_tab == 'Pop-up', help="<div style='margin-bottom: 10px;'>Pop-up</div>"):
+#         current_tab = 'Pop-up'
+#         st.experimental_set_query_params(tab=current_tab)
+#         popup_content()
+#         
+# =============================================================================
+    if st.button("Homepage"):
+         current_tab = 'Homepage'
+         st.experimental_set_query_params(tab=current_tab)
+         homepage_content()
     
-    if st.checkbox("Gym", key="Gym", value=current_tab == 'Gym', help="<div style='margin-bottom: 10px;'>Gym</div>"):
-        current_tab = 'Gym'
-        st.experimental_set_query_params(tab=current_tab)
-        gym_content(data)
+    elif st.button("Gym"):
+         current_tab = 'Gym'
+         st.experimental_set_query_params(tab=current_tab)
+         gym_content(data)
     
-    if st.checkbox("Health", key="Health", value=current_tab == 'Health', help="<div style='margin-bottom: 10px;'>Health</div>"):
-        current_tab = 'Health'
-        st.experimental_set_query_params(tab=current_tab)
-        health_content()
+    elif st.button("Health"):
+         current_tab = 'Health'
+         st.experimental_set_query_params(tab=current_tab)
+         health_content()
     
-    if st.checkbox("Pop-up", key="Pop-up", value=current_tab == 'Pop-up', help="<div style='margin-bottom: 10px;'>Pop-up</div>"):
-        current_tab = 'Pop-up'
-        st.experimental_set_query_params(tab=current_tab)
-        popup_content()
+    elif st.button("Pop-up"):
+         current_tab = 'Pop-up'
+         st.experimental_set_query_params(tab=current_tab)
+         popup_content()
 
 
 
@@ -121,21 +210,23 @@ def main():
 def homepage_content():
     
     st.write('With our app you can see the data related to EDA and BVP while keeping a track of your calories and weight!')
-    st.write('EDA:', 'BVP:')
+    st.divider()
+    st.write('The EDA stands for Electrodermal activity. EDA is used to measure the conductance of the skin, also known as sweat.')
+    st.write(' The BVP stands for blood volume pulse. The BVP is used as a method to measure heartbeats by measuring the volume of blood that flows through the arteries where the sensor is placed, the E4 empathica wristband.')
     
-    # Add some introductory text
+    st.divider()
     st.write('Average weekly calorie consumption(measured by last 7 inputs in dataframe): 123')
     st.write('Average weekly weight(measured by last 7 inputs in dataframe): 123')
-    
-    st.write('Pop-up button')
+    st.divider()
 
+    #st.write('Pop-up Button')
     calendar = pd.DataFrame(index=['Week 1','Week 2','Week 3', 'Week 4'], columns=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
     st.write(calendar)
     
-    st.markdown('<style>' + open('icons.css').read() + '</style>', unsafe_allow_html=True)
+    #st.markdown('<style>' + open('icons.css').read() + '</style>', unsafe_allow_html=True)
     
     # Add any additional content you want for the homepage
-    st.write('Homepage Button' , )
+    #st.write('Homepage Button')
     
    
 
@@ -148,37 +239,6 @@ def gym_content(data):
 
     # Call function for interactive line charts
     plot_interactive_line_charts(data, data['Time'].min(), data['Time'].max(), data['Time'].min(), data['Time'].max())
-
-    # Read data for the bar chart from another CSV file
-    bar_chart_data_path = r"C:\Users\anilp\Project_Files\10-11-2023 23h06m48s\df_result.csv"
-    bar_chart_data = pd.read_csv(bar_chart_data_path)
-
-    # Categorize values into Low, Medium, and High based on percentiles
-    low_threshold = bar_chart_data['EDA'].quantile(0.33)
-    high_threshold = bar_chart_data['EDA'].quantile(0.67)
-
-    bar_chart_data['Category'] = pd.cut(bar_chart_data['EDA'], bins=[float('-inf'), low_threshold, high_threshold, float('inf')],
-                              labels=['Low', 'Medium', 'High'])
-
-    # Create a bar chart for the new data
-    fig, ax = plt.subplots()
-
-    # Count the occurrences in each category
-    category_counts = bar_chart_data['Category'].value_counts()
-
-    # Bar for each category
-    for category in category_counts.index:
-        ax.bar(category, category_counts[category], label=category)
-
-    ax.set_ylabel('Count')
-    ax.set_title('Category Distribution from Bar Chart Data')
-    ax.legend(title='Category')
-
-    # Set y-axis limits
-    ax.set_ylim(0, 50)
-
-    # Display the bar chart using st.pyplot
-    st.pyplot(fig)
 
     
 
@@ -195,12 +255,9 @@ def health_content():
     weight = pd.DataFrame(index=['Input values'], columns=['Your weight on Monday was : ', 'Your weight on Tuesday was : ', 'Your weight on Wednesday was : ',
     'Your weight on Thursday was : ', 'Your weight on Friday was : ', 'Your weight on Saturday was : ', 'Your weight on Sunday was : '])
     
-    st.write(calorie)
-    st.write('Average calorie consumption for your week was : ')
+    st.write(calorie, 'Average calorie consumption for your week was : ')
     
-    st.write(weight)
-    st.write('Avegare weight for your week was : ')
-
+    st.write(weight, 'Avegare weight for your week was : ')
 
 # Function for Pop-up content
 @st.cache_resource(experimental_allow_widgets=True)
