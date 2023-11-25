@@ -97,6 +97,8 @@ def plot_interactive_bar_chart_HR():
 # Function to plot interactive line charts for EDA and BVP
 def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_bvp, end_time_bvp):
     
+    st.write('Here you will see two graphs regarding your EDA. The first graph will show your EDA metrics before and after your gym session. The second graph will show your overall EDA levels. You can see three columns (low/medium/high) this will show how intense your workout was based on your EDA levels. So you can use this graph to interpret if you had a low, medium or high intensity gym session.')
+    
     # Filter data for EDA based on time range
     filtered_data_eda = data[(data['Time'] >= start_time_eda) & (data['Time'] <= end_time_eda)]
     
@@ -110,6 +112,8 @@ def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_
     
     st.plotly_chart(fig_eda)
     plot_interactive_bar_chart_EDA()
+    
+    st.write('Here you will see two graphs regarding your HR. The first graph will show your HR metrics before and after your gym session. The second graph will show your overall HR levels. You can see three columns (low/medium/high) this will show how intense your workout was based on your HR levels. So you can use this graph to interpret if you had a low, medium or high intensity gym session.')
 
     # Filter data for BVP based on time range
     filtered_data_bvp = data[(data['Time'] >= start_time_bvp) & (data['Time'] <= end_time_bvp)]
@@ -208,7 +212,7 @@ def homepage_content():
     st.write('With our app you can see the data related to EDA and BVP while keeping a track of your calories and weight!')
     st.divider()
     st.write('The EDA stands for Electrodermal activity. EDA is used to measure the conductance of the skin, also known as sweat.')
-    st.write(' The BVP stands for blood volume pulse. The BVP is used as a method to measure heartbeats by measuring the volume of blood that flows through the arteries where the sensor is placed, the E4 empathica wristband.')
+    st.write('HR stands for Heartrate, also known as the number of times your heart beats per minute. the HR is calculated by collecting the BVP signal (Blood volume pulse).BVP is measeaured by measuring the volume of blood that flows through the arteries where the sensor is placed, the E4 empathica wristband.')
     
     st.divider()
     st.write('Average weekly calorie consumption(measured by last 7 inputs in dataframe): 123')
@@ -231,7 +235,7 @@ def homepage_content():
 @st.cache_resource(experimental_allow_widgets=True)
 def gym_content(data):
     
-    st.write('This is the gym content.')
+    st.write('Welcome to your gym page! Here you will see your health metrics regarding your gym sessions.')
 
     # Call function for interactive line charts
     plot_interactive_line_charts(data, data['Time'].min(), data['Time'].max(), data['Time'].min(), data['Time'].max())
