@@ -125,12 +125,20 @@ def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_
 
 
 def homepage(mean_calorie, mean_weight, health_data=None):
+    
     st.subheader("Welcome to the Homepage!")
+    st.divider()
+    
+    st.write('With our app you can see the data related to EDA and HR while keeping a track of your calories and weight!')
+    st.write('The EDA stands for Electrodermal activity. EDA is used to measure the conductance of the skin, also known as sweat.')
+    st.write('HR stands for Heartrate, also known as the number of times your heart beats per minute. the HR is calculated by collecting the BVP signal (Blood volume pulse).BVP is measeaured by measuring the volume of blood that flows through the arteries where the sensor is placed, the E4 empathica wristband.')
+    
+    st.divider()
     st.write(f"Average Calorie Intake: {mean_calorie} calories")
     st.write(f"Average Weight: {mean_weight} kg")
 
     if health_data:
-        st.subheader("Health Information")
+        st.subheader("Below you can see your previous entries.")
         
         df_health_data = pd.DataFrame(health_data).T.reset_index()
         df_health_data.columns = ['Date', 'Calories', 'Weight']
@@ -139,7 +147,7 @@ def homepage(mean_calorie, mean_weight, health_data=None):
         st.dataframe(df_health_data)
 
 def popup():
-    st.subheader("Health Information")
+    st.subheader("Please select a date to enter your values in.")
     
     selected_dates = st.multiselect("Select dates:", pd.date_range(start='2023-11-25', end='2023-12-31'))
 
@@ -198,6 +206,8 @@ def main():
         render_health()
         
     elif current_tab == "Gym":
+        
+        st.write('Welcome to your gym page! Here you will see your health metrics regarding your gym sessions.')
         plot_interactive_line_charts(data, data['Time'].min(), data['Time'].max(), data['Time'].min(), data['Time'].max())
 
 if __name__ == "__main__":
