@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
-import matplotlib.pyplot as plt
+
 
 # To show overall data
 def plot_interactive_bar_chart_EDA():
@@ -123,7 +122,7 @@ def plot_interactive_line_charts(data, start_time_eda, end_time_eda, start_time_
     st.plotly_chart(fig_hr)
     plot_interactive_bar_chart_HR()
 
-
+# Homepage text
 def homepage(mean_calorie, mean_weight, health_data=None):
     
     st.subheader("Welcome to the Homepage!")
@@ -137,6 +136,7 @@ def homepage(mean_calorie, mean_weight, health_data=None):
     st.write(f"Average Calorie Intake: {mean_calorie} calories")
     st.write(f"Average Weight: {mean_weight} kg")
 
+    # To show input from popup() in a dataframe
     if health_data:
         st.subheader("Below you can see your previous entries.")
         
@@ -146,11 +146,14 @@ def homepage(mean_calorie, mean_weight, health_data=None):
         df_health_data['Date'] = pd.to_datetime(df_health_data['Date']).dt.date
         st.dataframe(df_health_data)
 
+# This page enables input from client to be analyzed in Homepage
 def popup():
     st.subheader("Please select a date to enter your values in.")
     
+    # Entry of date
     selected_dates = st.multiselect("Select dates:", pd.date_range(start='2023-11-25', end='2023-12-31'))
 
+    # Input calorie intake and weight per date
     for date in selected_dates:
         st.write(f"Date: {date}")
         calorie_input = st.number_input("Enter your daily calorie intake:", min_value=0)
@@ -158,6 +161,7 @@ def popup():
 
         if st.button("Saved"):
            
+            # Save the inputs into a session
             if 'health_data' not in st.session_state:
                 st.session_state.health_data = {}
 
@@ -165,6 +169,7 @@ def popup():
 
             st.success("Health information saved!")
             
+# Calculating the average of inputs
 def render_homepage():
     mean_calorie = mean_weight = 0
     health_data = getattr(st.session_state, 'health_data', {})
@@ -177,17 +182,16 @@ def render_homepage():
 
     homepage(mean_calorie, mean_weight, health_data)
 
+# To initialize Health Page
 def render_health():
     popup()
 
-
+# Reads csv for linegraphs and setup of the UI
 def main():
     
-    # Read data from CSV file
     csv_file_path = r"C:\Users\anilp\Project_Files\testing\df_result.csv"
     data = pd.read_csv(csv_file_path)
 
-   # Convert 'Time' column to datetime format
     data['Time'] = pd.to_datetime(data['Time'])
    
     st.set_page_config(page_title="Health App", layout="wide")
